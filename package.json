@@ -22,7 +22,10 @@
     "expo": "^24.0.0",
     "expo-three": "^2.2.2-alpha.1",
     "react": "16.2.0",
+    "react-cloud-vision-api": "^0.3.0",
     "react-native": "0.51.0",
+    "react-native-camera": "^1.0.1",
+    "react-native-view-shot": "^2.3.0",
     "three": "^0.90.0"
   }
 }

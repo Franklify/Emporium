@@ -3,18 +3,20 @@ import * as THREE from 'three';
 import ExpoTHREE from 'expo-three';
 import Expo from 'expo';
 import React from 'react';
+import { captureScreen } from "react-native-view-shot";
 import { 
   Image,
   StyleSheet, 
   Text, 
+  TouchableHighlight,
   View
 } from 'react-native';
 
 console.disableYellowBox = true;
-const endpoint = 'http://10.19.186.14:6666/fakescrape';
 
 const maxBarLength = 0.2;
 const square = 0.005;
+const changed = true;
 
 export default class App extends React.Component {
   constructor(props) {
@@ -23,13 +25,61 @@ export default class App extends React.Component {
       width: 0.07,
       height: 0.07,
       reviews: [30, 10, 0, 0, 20],
-      texter: "thinking..."
+      header: "Take a photo!",
     };
+  }
+  
+  async _takePhoto() {
+    this.setState({header: 'Thinking...'});
+    if (this._glView) {
+      console.log("Getting Base64...");
+      let snapshot = await Expo.takeSnapshotAsync(this._glView, {format: 'png', result: 'base64', quality: 1.0})
+
+      console.log('Converted screenshot.');
+      if (snapshot == null) {
+        console.log('Snapshot was null.');
+      }
+      let result = await this._vision(snapshot);
+      if (result.responses[0].labelAnnotations[0].description != null) {
+        console.log(result.responses[0].labelAnnotations[0].description);
+        var newHeader = result.responses[0].labelAnnotations[0].description;
+        this.setState({header: newHeader.charAt(0).toUpperCase() + newHeader.slice(1)})
+      }
+    } else {
+      console.log('Could not find GLView.');
+    }
+  }
+
+  async _vision(base64) {
+    console.log('Fetching Google Vision API results...');
+    return await fetch('https://vision.googleapis.com/v1/images:annotate?key=AIzaSyBd5Bv093rvwS65reLu6Wt2pm1nhXfdi2U', {
+      method: 'POST',
+      body: JSON.stringify({
+        "requests": [
+          {
+            "image": {
+              "content": base64
+            },
+            "features": [
+              {
+                "type": "LABEL_DETECTION"
+              }
+            ]
+          }
+        ]
+      })
+    }).then((response) => {
+      console.log('Google Vision response returned successfully.');
+      return response.json();
+    }, (err) => {
+      console.error('promise rejected')
+      console.error(err)
+    });
   }
 
   async _item(item) {
     try {
-      let response = await fetch(endpoint, {
+      let response = await fetch('http://10.19.186.14:6666/get_info', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -39,6 +89,7 @@ export default class App extends React.Component {
         }),
       });
       this.setState({texter: response._bodyText})
+      // image url, sale rank, price
       return response._bodyText;
     } catch (error) {
       console.error(error);
@@ -47,7 +98,7 @@ export default class App extends React.Component {
 
   async _question(question) {
     try {
-      let response = await fetch(endpoint, {
+      let response = await fetch('http://10.19.186.14:6666/fakescrape', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -62,18 +113,30 @@ export default class App extends React.Component {
       console.error(error);
     }
   }
-  
+
   render() {
-    console.log("working");
     return (
-      <Expo.GLView
-        ref={(ref) => this._glView = ref}
-        style={{ flex: 1 }}
-        onContextCreate={this._onGLContextCreate}
-      />
+      <View>
+        <Expo.GLView
+          ref={(ref) => this._glView = ref}
+          style={{ height: 820 }}
+          onContextCreate={this._onGLContextCreate}
+        />
+        <TouchableHighlight 
+          style={{ position: 'absolute', left: 35, top: 730 }}
+          onPress={() => {this._takePhoto()}}>
+          <Image
+            style={{ width: 60, height: 60 }}
+            source={require('./assets/camera.png')}
+          />
+        </TouchableHighlight>
+        <Text style={{ position: 'absolute', left: 100, top: 50, backgroundColor: 'rgba(0,0,0,0)', color: 'white', fontSize: 30}}>
+          {this.state.header}
+        </Text>
+      </View>
     );
   }
-
+  
   _onGLContextCreate = async (gl) => {
     console.log("working");
     const arSession = await this._glView.startARSessionAsync();
@@ -104,9 +167,37 @@ export default class App extends React.Component {
     camera.position.z = -0.4;
     scene.add(cube);
 
+    /*
     // Draw Header
+    var loader = new THREE.FontLoader();
+    loader.load( './fonts/helvetiker_regular.typeface.json', function ( font ) {
 
+      var textGeometry = new THREE.TextGeometry( 'Amazon Alexa Dot', {
+        font: font,
+        size: 80,
+        height: 5,
+        curveSegments: 12,
+        bevelEnabled: true,
+        bevelThickness: 10,
+        bevelSize: 8,
+        bevelSegments: 5
+      } );
+    } );
 
+    var textMaterials = [
+      new THREE.MeshBasicMaterial( { color: 0xffffff, overdraw: 0.5 } ),
+      new THREE.MeshBasicMaterial( { color: 0x000000, overdraw: 0.5 } )
+    ];
+    
+    var mesh = new THREE.Mesh( textGeometry, textMaterials );
+    mesh.position.x = 0;
+    mesh.position.y = 100;
+    mesh.position.z = 0;
+    group = new THREE.Group();
+    group.add( mesh );
+    scene.add( group );*/
+
+    
     // Draw Reviews
     const reviews = this.state.reviews;
     var total = 0;
