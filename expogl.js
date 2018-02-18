@@ -27,6 +27,11 @@ export default class App extends React.Component {
     };
   }
 
+  /*componentWillMount() {
+    //var testQuestion = "What's it made of?";
+    //this._question(testQuestion);
+  }
+
   async _item(item) {
     try {
       let response = await fetch(endpoint, {
@@ -61,8 +66,16 @@ export default class App extends React.Component {
     } catch (error) {
       console.error(error);
     }
-  }
-  
+  }*/
+
+  /*render() {
+    return (
+      <View style={styles.container}>
+        <Text>{this.state.texter}</Text>
+      </View>
+    );
+  }*/
+
   render() {
     console.log("working");
     return (
