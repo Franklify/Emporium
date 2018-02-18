@@ -8,11 +8,19 @@
       },
       "features": [
         {
-          "type": "LANDMARK_DETECTION",
+          "type": "LOGO_DETECTION",
           "maxResults": 1
         },
         {
+          "type": "TEXT_DETECTION",
+          "maxResults": 2
+        },
+        {
           "type": "WEB_DETECTION",
+          "maxResults": 2
+        },
+        {
+          "type": "LABEL_DETECTION",
           "maxResults": 2
         }
       ]
