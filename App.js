@@ -28,8 +28,8 @@ export default class App extends React.Component {
     this.state = {
       width: 0.07,
       height: 0.07,
-      w: 150,
-      h: 150,
+      w: 0.01,
+      h: 0.01,
       db: [
         {
           name: 'wallet', 
@@ -99,14 +99,14 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
-    this.interval = setInterval(() => {
+    /*this.interval = setInterval(() => {
       if (!paused) {
         var vibs = this._getInfo();
         if (vibs != product) {
           product = vibs;
         }
       }
-    }, 5000);
+    }, 5000);*/
   }
   
   // Takes what's on screen and displays Google Vision's results in text
@@ -128,8 +128,8 @@ export default class App extends React.Component {
       var item = this._analyze(result);
       this.setState({header: item});
 
-      var info = this._item(item);
-      console.log(info);
+      //var info = this._item(item);
+      //console.log(info);
       paused = !paused;
     } else {
       console.log('Could not find GLView.');
@@ -185,9 +185,9 @@ export default class App extends React.Component {
             },
             "features": [
               {
-                //"type": "LOGO_DETECTION",
+                "type": "LOGO_DETECTION",
                 //"type": "TEXT_DETECTION",
-                "type": "WEB_DETECTION",
+                //"type": "WEB_DETECTION",
                 //"type": "LABEL_DETECTION",
               }
             ]
@@ -350,7 +350,7 @@ export default class App extends React.Component {
     const material = new THREE.MeshBasicMaterial({
       // NOTE: How to create an Expo-compatible THREE texture
       map: await ExpoTHREE.createTextureAsync({
-        asset: Expo.Asset.fromModule(require('./assets/soylent.jpeg')),
+        asset: Expo.Asset.fromModule(require('./assets/doritos.jpeg')),
       }),
     });
     const cube = new THREE.Mesh(geometry, material);
